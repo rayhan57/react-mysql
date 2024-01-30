@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
-import TableData from "./components/TableData";
-import ModalForm from "./components/ModalForm";
+import { useDispatch, useSelector } from "react-redux";
 import Alert from "./components/Alert";
+import ButtonTambah from "./components/ButtonTambah";
+import ModalForm from "./components/ModalForm";
+import Search from "./components/Search";
+import TableData from "./components/TableData/TableData";
 import {
   addStudent,
   deleteStudent,
   getAllStudents,
   updateStudent,
 } from "./libs/fetchingApi";
-import ButtonTambah from "./components/ButtonTambah";
-import Search from "./components/Search";
+import { setCurrentData, setTotalPage } from "./state/paginationSlice";
 
 const App = () => {
   const [showModal, setShowModal] = useState(false);
@@ -25,21 +27,29 @@ const App = () => {
   const [studentsData, setStudentsData] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [searchResult, setSearchResult] = useState([]);
+  const { currentPage, currentData } = useSelector((state) => state.pagination);
+  const dispatch = useDispatch();
 
   const fetchingData = async () => {
     const allStudents = await getAllStudents();
     setStudentsData(allStudents.data);
+
+    const dataPerPage = 10;
+    const startIndex = (currentPage - 1) * dataPerPage;
+    const endIndex = startIndex + dataPerPage;
+    dispatch(setTotalPage(Math.ceil(allStudents.data.length / dataPerPage)));
+    dispatch(setCurrentData(allStudents.data.slice(startIndex, endIndex)));
+  };
+
+  const handleSuccess = () => {
+    setShowModal(false);
+    setStatusAlert(textModal === "Tambah" ? "menambah" : "mengubah");
+    setShowAlert(true);
+    fetchingData();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const handleSuccess = () => {
-      setShowModal(false);
-      setStatusAlert(textModal === "Tambah" ? "menambah" : "mengubah");
-      setShowAlert(true);
-      fetchingData();
-    };
 
     if (textModal === "Tambah") {
       await addStudent(formData, handleSuccess);
@@ -72,7 +82,9 @@ const App = () => {
   useEffect(() => {
     fetchingData();
     handleSearch();
-  }, [searchValue]);
+  }, [searchValue, currentPage]);
+
+  console.log();
 
   return (
     <>
@@ -97,7 +109,7 @@ const App = () => {
         </div>
 
         <TableData
-          studentsData={searchValue ? searchResult : studentsData}
+          studentsData={searchValue ? searchResult : currentData}
           setShowModal={setShowModal}
           setTextModal={setTextModal}
           formData={formData}

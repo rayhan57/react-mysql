@@ -1,5 +1,5 @@
-import mysql from "mysql";
 import { config } from "dotenv";
+import mysql from "mysql";
 
 config();
 
