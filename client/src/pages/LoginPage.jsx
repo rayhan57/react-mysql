@@ -1,26 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { loginUser } from "../libs/fetchingApi";
+import { getSession, setSession } from "../libs/userSession";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
+  const [userData, setUserData] = useState({ username: "", password: "" });
   const [error, setError] = useState(false);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    setUserData({ ...userData, [id]: value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const loggedInUser = await loginUser(formData);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const user = await loginUser(userData);
 
-    if (loggedInUser) {
+    if (user) {
+      setSession(userData);
       window.location.href = "/";
     } else {
       setError(true);
     }
   };
+
+  useEffect(() => {
+    const userSession = getSession();
+    if (userSession) {
+      window.location.href = "/";
+    }
+  }, []);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50">

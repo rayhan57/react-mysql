@@ -12,6 +12,8 @@ import {
   updateStudent,
 } from "../libs/fetchingApi";
 import { setCurrentData, setTotalPage } from "../state/paginationSlice";
+import { getSession } from "../libs/userSession";
+import Greetings from "../components/Greetings";
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -84,12 +86,21 @@ const HomePage = () => {
     handleSearch();
   }, [searchValue, currentPage]);
 
+  useEffect(() => {
+    const userSession = getSession();
+    if (!userSession) {
+      window.location.href = "/user/login";
+    }
+  }, []);
+
   return (
     <>
       <div className="container mt-5">
         <h1 className="mb-5 text-center text-xl font-bold lg:mb-10 lg:text-2xl">
           Data Mahasiswa
         </h1>
+
+        {getSession() && <Greetings user={getSession()} />}
 
         <Alert
           showAlert={showAlert}
