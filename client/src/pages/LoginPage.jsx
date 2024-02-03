@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { loginUser } from "../libs/fetchingApi";
 import { getSession, setSession } from "../libs/userSession";
 
 const LoginPage = () => {
+  const isAuth = getSession();
+
+  if (isAuth) {
+    return <Navigate to="/" />;
+  }
+
   const [userData, setUserData] = useState({ username: "", password: "" });
   const [error, setError] = useState(false);
 
@@ -23,13 +29,6 @@ const LoginPage = () => {
       setError(true);
     }
   };
-
-  useEffect(() => {
-    const userSession = getSession();
-    if (userSession) {
-      window.location.href = "/";
-    }
-  }, []);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50">

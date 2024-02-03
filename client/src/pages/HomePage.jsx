@@ -86,13 +86,6 @@ const HomePage = () => {
     handleSearch();
   }, [searchValue, currentPage]);
 
-  useEffect(() => {
-    const userSession = getSession();
-    if (!userSession) {
-      window.location.href = "/user/login";
-    }
-  }, []);
-
   return (
     <>
       <div className="container mt-5">

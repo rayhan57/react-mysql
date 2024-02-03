@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import { registerUser } from "../libs/fetchingApi";
 import { getSession } from "../libs/userSession";
 
 const RegisterPage = () => {
+  const isAuth = getSession();
+
+  if (isAuth) {
+    return <Navigate to="/" />;
+  }
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,13 +32,6 @@ const RegisterPage = () => {
       setError(true);
     }
   };
-
-  useEffect(() => {
-    const userSession = getSession();
-    if (userSession) {
-      window.location.href = "/";
-    }
-  }, []);
 
   return (
     <div className="flex h-screen items-center justify-center bg-slate-50">
